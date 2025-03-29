@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot;
 import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmGripper.GripperVoltage;
 import frc.robot.subsystems.CoralArmPivot;
@@ -111,8 +112,8 @@ public class ElevatorSupersystem {
             .onlyIf(hasCoral.negate()); // only run of we don't already have a coral
     }
 
-    public Trigger hasIntaked = elevator.isAtHeight(ElevatorHeight.postIntakeCatch)
-        .and(hasCoral);
+    public Trigger hasIntaked = (elevator.isAtHeight(ElevatorHeight.postIntakeCatch)
+        .and(hasCoral)).or(Robot::isSimulation); // lets us run in sim, even without simulating the arm or the elevator
 
     public Command intakeLoad() {
         return setState(ElevatorHeight.intakeGrip, PivotAngle.intakeGrip, GripperVoltage.intakeCoral)
@@ -162,12 +163,16 @@ public class ElevatorSupersystem {
             .onlyIf(hasCoral);
     }
 
-    public Trigger canScoreL4 = elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
-        .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL4))
-        .and(hasCoral);
+    public Trigger canScoreL4 =
+        (elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
+            .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL4))
+            .and(hasCoral))
+        .or(Robot::isSimulation); // lets us run in sim, even without simulating the arm or the elevator;
 
-    public Trigger hasScoredL4 = elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
-        .and(coral_arm_pivot.isAtAngle(0));
+    public Trigger hasScoredL4 =
+        (elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
+            .and(coral_arm_pivot.isAtAngle(0)))
+        .or(Robot::isSimulation); // lets us run in sim, even without simulating the arm or the elevator;
 
     public Command coralScoreL4() {
         return setStatePivot(0)

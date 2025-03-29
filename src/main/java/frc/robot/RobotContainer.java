@@ -94,19 +94,21 @@ public class RobotContainer {
 
     public RobotContainer() {
         if (Robot.isSimulation()) DriverStation.silenceJoystickConnectionWarning(true);
-
-        // Add Autos
-        auto_factory = drivetrain.createAutoFactory();
-        auto_routines = new AutoRoutines(auto_factory);
-        auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
-        auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
-        auto_chooser.addRoutine("Blue Center Cage 2L4", auto_routines::BlueCenterCage2l4);
-
-        SmartDashboard.putData("Auto Chooser", auto_chooser);
-
+        
         // Targets for autoalign
         autoalign_lefts = AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts);
         autoalign_rights = AllianceFlipUtil.applyAll(FieldConstants.Reef.rights);
+
+        // Add Autos
+        auto_factory = drivetrain.createAutoFactory();
+        auto_routines = new AutoRoutines(auto_factory, drivetrain);
+        auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
+        auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
+        auto_chooser.addRoutine("Blue Center Cage 2L4", auto_routines::BlueCenterCage2l4);
+        auto_chooser.addRoutine("Blue Center Cage 2L4 AUTOALIGN", auto_routines::BlueCenterCage2l4AUTOALIGN);
+
+        SmartDashboard.putData("Auto Chooser", auto_chooser);
+
 
         hps = AllianceFlipUtil.apply(new Pose2d(new Translation2d(1.1446170806884766, 0.9114338755607605), Rotation2d.fromRadians(-2.203650142759433)));
         

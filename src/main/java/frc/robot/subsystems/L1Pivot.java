@@ -20,7 +20,6 @@ public class L1Pivot extends SubsystemBase {
 
     private static final TalonFX pivotMotor = new TalonFX(pivotMotorID, "canivore");
     private static final MotionMagicVoltage pivot_position_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
-    DigitalInput limSwitch = new DigitalInput(limSwitchDIO);
 
     L1Pivot() {
         configureMotors();
@@ -68,7 +67,7 @@ public class L1Pivot extends SubsystemBase {
         pivot_cfg.Slot0.kP = 1;
         pivot_cfg.Slot0.kI = 0;
         pivot_cfg.Slot0.kD = 0.2;
-        
+
         pivotMotor.getConfigurator().apply(pivot_cfg);
     }
 
