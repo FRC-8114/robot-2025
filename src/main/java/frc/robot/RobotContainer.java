@@ -5,6 +5,7 @@
 // @formatter:off
 package frc.robot;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -27,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveToPose;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
@@ -36,6 +36,7 @@ import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StatusLED;
+import frc.robot.subsystems.CoralArmGripper.GripperVoltage;
 import frc.robot.supersystems.ElevatorSupersystem;
 import frc.robot.supersystems.L1Supersystem;
 import frc.robot.util.AllianceFlipUtil;
@@ -47,7 +48,7 @@ public class RobotContainer {
     CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
     CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     StatusLED status_led = StatusLED.getInstance();
-    L1Supersystem l1Supersystem = L1Supersystem.getInstance();
+    // L1Supersystem l1_supersystem = L1Supersystem.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
 
@@ -87,18 +88,9 @@ public class RobotContainer {
         return -controller.getLeftY(); //slew_rate_limiter_y.calculate(-controller.getLeftY());
     }
 
-    private List<Pose2d> autoalign_lefts;
-    private List<Pose2d> autoalign_rights;
-
-    private final Pose2d hps;
-
     public RobotContainer() {
         if (Robot.isSimulation()) DriverStation.silenceJoystickConnectionWarning(true);
-        
-        // Targets for autoalign
-        autoalign_lefts = AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts);
-        autoalign_rights = AllianceFlipUtil.applyAll(FieldConstants.Reef.rights);
-
+    
         // Add Autos
         auto_factory = drivetrain.createAutoFactory();
         auto_routines = new AutoRoutines(auto_factory, drivetrain);
@@ -109,26 +101,34 @@ public class RobotContainer {
 
         SmartDashboard.putData("Auto Chooser", auto_chooser);
 
-
-        hps = AllianceFlipUtil.apply(new Pose2d(new Translation2d(1.1446170806884766, 0.9114338755607605), Rotation2d.fromRadians(-2.203650142759433)));
-        
         configureBindings();
     }
 
     private final double turtle_mode = 0.15;
     private final double slower_turtle_mode = 0.035;
-
     private Trigger turtle_trigger = new Trigger(() -> (elevator.getHeight() >= Elevator.ElevatorHeight.scoreL2)).and(DriverStation::isTeleopEnabled);
 
-    // Auto align bindings
+    private List<Pose2d> autoalign_lefts;
+    private List<Pose2d> autoalign_rights;
+    private List<Pose2d> hps;
+    public void allianceFlipPoses() {
+        hps = AllianceFlipUtil.applyAll(FieldConstants.HPS.both_hps);
+        autoalign_lefts = AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts);
+        autoalign_rights = AllianceFlipUtil.applyAll(FieldConstants.Reef.rights);
+    }
+
+    private Supplier<Pose2d> nearestHPS() {
+        return () -> drivetrain.getState().Pose.nearest(hps);
+    }
+
     private Supplier<Pose2d> nearestLeftCoral() {
         return () ->
-            drivetrain.getState().Pose.nearest(autoalign_lefts);
+            drivetrain.getState().Pose.nearest(autoalign_rights);
     }
 
     private Supplier<Pose2d> nearestRightCoral() {
         return () ->
-            drivetrain.getState().Pose.nearest(autoalign_rights);
+            drivetrain.getState().Pose.nearest(autoalign_lefts);
     }
 
     public void configureBindings() {
@@ -161,22 +161,24 @@ public class RobotContainer {
 
         // orchestra.play();
 
-        controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        controller.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))
-        ));
+        controller.b().whileTrue(supersystem.setStateGripper(GripperVoltage.intakeCoral).until(supersystem.hasCoral)).onFalse(supersystem.setStateGripper(0));
+        controller.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // controller.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))
+        // ));
 
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        controller.back().and(controller.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        controller.back().and(controller.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        controller.start().and(controller.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        controller.start().and(controller.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // controller.back().and(controller.a()).whileTrue(ElevatorSupersystem.coral_arm_pivot.runSysICommand());
+        // // Run SysId routines when holding back/start and X/Y.
+        // // Note that each routine should be run exactly once in a single log.
+        // controller.back().and(controller.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // controller.back().and(controller.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // controller.start().and(controller.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // controller.start().and(controller.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
         controller.leftBumper().and(controller.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        // controller.leftTrigger().onTrue(l1_supersystem.deployIntake()).onFalse(l1_supersystem.returnIntake());
 
         controller.povLeft().whileTrue(
             drivetrain.applyRequest(() ->
@@ -208,9 +210,9 @@ public class RobotContainer {
 
         DriveToPose left_go_to_pose = new DriveToPose(drivetrain, nearestLeftCoral());
         DriveToPose right_go_to_pose = new DriveToPose(drivetrain, nearestRightCoral());
-        DriveToPose hps_go_to_pose = new DriveToPose(drivetrain, () -> hps);
+        DriveToPose hps_go_to_pose = new DriveToPose(drivetrain, nearestHPS());
 
-        (new Trigger(() -> left_go_to_pose.atGoal() && right_go_to_pose.atGoal())).whileTrue(
+        (new Trigger(() -> left_go_to_pose.atGoal() || right_go_to_pose.atGoal() || hps_go_to_pose.atGoal())).whileTrue(
             status_led.flashColor(
                 new Color(0, 255, 0),
                 new Color(255, 255, 0),
@@ -259,8 +261,6 @@ public class RobotContainer {
         // storage positions
         launchpad.getButton(0, 7).onTrue(supersystem.storagePositionAlgae());
         launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
-
-        // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
 
         launchpad.getButton(0, 6).onTrue(supersystem.setStatePivot(0));
 

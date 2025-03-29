@@ -105,7 +105,7 @@ public class ElevatorSupersystem {
     // INTAKE
     public Command intakePrepare() {
         return setStatePivot(0)
-            .until(coral_arm_pivot.isAtAngle(0))
+            .until(coral_arm_pivot.isGreaterThanAngle(-0.1))
             .andThen(setStateElevator(ElevatorHeight.intakeCatch))
             .until(elevator.isAtHeight(ElevatorHeight.intakeCatch))
             .andThen(setState(ElevatorHeight.intakeCatch, PivotAngle.intakeCatch, GripperVoltage.zero))
@@ -166,7 +166,8 @@ public class ElevatorSupersystem {
     public Trigger canScoreL4 =
         (elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
             .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL4))
-            .and(hasCoral))
+            // .and(hasCoral)
+            )
         .or(Robot::isSimulation); // lets us run in sim, even without simulating the arm or the elevator;
 
     public Trigger hasScoredL4 =

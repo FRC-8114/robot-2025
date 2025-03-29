@@ -28,7 +28,7 @@ public class L1Pivot extends SubsystemBase {
     }
 
     public static class PivotAngle {
-        public static final double storage = 0;
+        public static final double storage = -0.249268;
         public static final double intake = 0;
         public static final double score = 0;
         
@@ -56,17 +56,18 @@ public class L1Pivot extends SubsystemBase {
         // Use internal sensor as feedback source
         pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         pivot_cfg.Feedback.SensorToMechanismRatio = pivotMotorGearRatio;
-    
+        pivot_cfg.Feedback.FeedbackRotorOffset = 0.244385;
+
         // MotionMagic
         pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
         pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
     
         // PID
         pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        pivot_cfg.Slot0.kG = 0.1;
-        pivot_cfg.Slot0.kP = 1;
+        pivot_cfg.Slot0.kG = 1;
+        pivot_cfg.Slot0.kP = 6;
         pivot_cfg.Slot0.kI = 0;
-        pivot_cfg.Slot0.kD = 0.2;
+        pivot_cfg.Slot0.kD = 0;
 
         pivotMotor.getConfigurator().apply(pivot_cfg);
     }

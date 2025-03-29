@@ -57,6 +57,7 @@ public class Vision {
 
         poseEstimators = List.of(front_cam, back_cam);
         // poseEstimators = List.of(front_cam);
+        // poseEstimators = List.of();
     }
 
     public void updateVision() {

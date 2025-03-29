@@ -7,7 +7,6 @@
 
 package frc.robot.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,7 +45,7 @@ public class AllianceFlipUtil
            : pose;
   }
 
-  public static List<Pose2d> applyAll(ArrayList<Pose2d> poses) {
+  public static List<Pose2d> applyAll(List<Pose2d> poses) {
     return poses.stream().map(AllianceFlipUtil::apply).toList();
   }
 

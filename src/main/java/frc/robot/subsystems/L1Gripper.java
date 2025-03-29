@@ -20,8 +20,8 @@ public class L1Gripper extends SubsystemBase {
 
     public static class GripperVoltage {
         public static final double zero = 0;
-        public static final double intake = 1.5;
-        public static final double score = -1.5;
+        public static final double intake = -1.5;
+        public static final double score = 1.5;
         
     }
 

@@ -6,11 +6,8 @@ package frc.robot;
 
 import frc.robot.subsystems.Vision;
 
-import com.ctre.phoenix6.Orchestra;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -20,20 +17,16 @@ public class Robot extends TimedRobot {
   private final RobotContainer robot_container;
   private final Vision vision;
 
-  private final Field2d field = new Field2d();
-
   public Robot() {
     robot_container = new RobotContainer();
     vision = new Vision(robot_container.drivetrain);
-    SmartDashboard.putData("telepose", field);
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    field.setRobotPose(robot_container.drivetrain.getPose());
     
-    vision.updateVision();
+    // vision.updateVision();
     // field.setRobotPose(robot_container.drivetrain.getPose());
   }
   
@@ -56,6 +49,10 @@ public class Robot extends TimedRobot {
     if (autonomous_command != null) {
       autonomous_command.schedule();
     }
+
+    robot_container.allianceFlipPoses();
+
+    // FieldConstants.Reef.initPoses();
   }
   
   @Override
@@ -74,6 +71,10 @@ public class Robot extends TimedRobot {
     if (autonomous_command != null) {
       autonomous_command.cancel();
     }
+
+    robot_container.allianceFlipPoses();
+
+    // FieldConstants.Reef.inwitPoses();
   }
   
   @Override

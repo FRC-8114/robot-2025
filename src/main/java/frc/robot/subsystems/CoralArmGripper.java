@@ -22,7 +22,7 @@ public class CoralArmGripper extends SubsystemBase {
 
     public static class GripperVoltage {
         public static final double zero = 0;
-        public static final double intakeCoral = 2;
+        public static final double intakeCoral = 2.5; // testing higher voltage
         public static final double releaseCoralL4 = -0.5;
         public static final double releaseCoralL3 = -1.5;
         public static final double releaseCoralL2 = -1.5;
