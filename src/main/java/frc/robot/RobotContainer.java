@@ -37,6 +37,7 @@ import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StatusLED;
 import frc.robot.supersystems.ElevatorSupersystem;
+import frc.robot.supersystems.L1Supersystem;
 import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
@@ -46,6 +47,7 @@ public class RobotContainer {
     CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
     CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     StatusLED status_led = StatusLED.getInstance();
+    L1Supersystem l1Supersystem = L1Supersystem.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
 

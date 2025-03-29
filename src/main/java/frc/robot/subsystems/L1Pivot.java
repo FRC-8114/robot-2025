@@ -22,13 +22,9 @@ public class L1Pivot extends SubsystemBase {
     private static final MotionMagicVoltage pivot_position_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
     DigitalInput limSwitch = new DigitalInput(limSwitchDIO);
 
-    private final Trigger atBack = new Trigger(() -> limSwitch.get());
-
     L1Pivot() {
         configureMotors();
-        atBack.onTrue(Commands.runOnce(() -> 
-            pivotMotor.setPosition(PivotAngle.storage)
-        ));
+        
         pivotMotor.setPosition(PivotAngle.storage);
     }
 

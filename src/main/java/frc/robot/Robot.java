@@ -32,6 +32,8 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     field.setRobotPose(robot_container.drivetrain.getPose());
+    
+    vision.updateVision();
     // field.setRobotPose(robot_container.drivetrain.getPose());
   }
   
@@ -76,7 +78,6 @@ public class Robot extends TimedRobot {
   
   @Override
   public void teleopPeriodic() {
-    vision.updateVision();
   }
   
   @Override
