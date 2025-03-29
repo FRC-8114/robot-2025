@@ -27,7 +27,8 @@ public class ElevatorSupersystem {
     public static boolean beam_break_override = false;
     
     public static final DigitalInput beam_break_sensor = new DigitalInput(beamBreakSensorDIO);
-    public final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get()).negate();
+
+    public final Trigger hasCoral = new Trigger(() -> !beam_break_sensor.get() || beam_break_override);
 
     private ElevatorSupersystem() {
         hasCoral
