@@ -5,7 +5,7 @@
 package frc.robot;
 
 import frc.robot.subsystems.Vision;
-
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +18,7 @@ public class Robot extends TimedRobot {
   private final Vision vision;
 
   public Robot() {
+    PortForwarder.add(5800, "photonvision.local", 5800);
     robot_container = new RobotContainer();
     vision = new Vision(robot_container.drivetrain);
   }
@@ -26,7 +27,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     
-    // vision.updateVision();
+    vision.updateVision();
     // field.setRobotPose(robot_container.drivetrain.getPose());
   }
   

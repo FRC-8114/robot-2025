@@ -1,17 +1,17 @@
 package frc.robot;
 
-import java.util.function.Supplier;
+// @formatter:off
 
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveToPose;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.supersystems.ElevatorSupersystem;
-import frc.robot.util.AllianceFlipUtil;
 
 public class AutoRoutines {
         private final ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
@@ -85,35 +85,51 @@ public class AutoRoutines {
 
         public AutoRoutine BlueCenterCage2l4AUTOALIGN() {
                 final AutoRoutine routine = factory.newRoutine("Blue Center Cage 2L4 AUTOALIGN");
-                final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4_AUTOALIGN", 0);
-                final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4_AUTOALIGN", 1);
-                final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4_AUTOALIGN", 2);
+                final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4", 0);
+                final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4", 1);
+                final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4", 2);
+                final AutoTrajectory driveback = routine.trajectory("blue_centercage_2l4", 3);
+
+                final DriveToPose dtp_1l4 = new DriveToPose(drivetrain, () -> drive_to_1l4.getFinalPose().get().plus(new Transform2d()));
+                final DriveToPose dtp_1hps = new DriveToPose(drivetrain, () -> drive_to_1hps.getFinalPose().get());
+                final DriveToPose dtp_2l4 = new DriveToPose(drivetrain, () -> drive_to_2l4.getFinalPose().get());
 
                 routine.active().onTrue(Commands.sequence(
-                                drive_to_1l4.resetOdometry(),
-                                drive_to_1l4.cmd()));
+                    drive_to_1l4.resetOdometry(),
+                    drive_to_1l4.spawnCmd()
+                ));
 
                 drive_to_1l4.atTime("Storage Position").onTrue(supersystem.storagePosition());
                 drive_to_1l4.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
-                drive_to_1l4.atTime("Score L4")
-                                .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
 
-                drive_to_1l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(drive_to_1hps.cmd());
-
-                // Supplier<Pose2d> goal_pose = () -> AllianceFlipUtil.apply(new Pose2d(3.982771873474121, 2.8459954261779785, new Rotation2d(1.034896238468816)));
-                Supplier<Pose2d> goal_pose = () -> AllianceFlipUtil.apply(new Pose2d(4.08438777923584, 2.9911606311798096, new Rotation2d(1.034896238468816)));
+                drive_to_1l4.recentlyDone().onTrue(Commands.sequence(
+                    // dtp_1l4.until(new Trigger(dtp_1l4::atGoal)),
+                    dtp_1l4.until(new Trigger(dtp_1l4::withinTolerance)),
+                    supersystem.coralScoreL4()
+                        .until(supersystem.hasScoredL4),
+                    drive_to_1hps.spawnCmd()
+                ));
 
                 drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
-                drive_to_1hps.recentlyDone().onTrue(
-                                Commands.waitSeconds(1.5) // Time for HP to place coral
-                                                .andThen(supersystem.intakeLoad()
-                                                                .until(supersystem.hasIntaked)
-                                                                .withTimeout(5))
-                                                .andThen(drive_to_2l4.spawnCmd()));
+                drive_to_1hps.recentlyDone().onTrue(Commands.sequence(
+                    // dtp_1hps.until(new Trigger(dtp_1hps::atGoal)),
+                    dtp_1hps.until(new Trigger(dtp_1hps::withinTolerance)),
+                    Commands.waitSeconds(1.5), // human player drops coral
+                    supersystem.intakeLoad()
+                        .until(supersystem.hasIntaked)
+                        .withTimeout(5),
+                    drive_to_2l4.spawnCmd()
+                ));
 
-                drive_to_2l4.recentlyDone().onTrue(
-                        new DriveToPose(drivetrain, goal_pose)
-                                .andThen(supersystem.coralScoreL4()));
+                drive_to_2l4.recentlyDone().onTrue(Commands.sequence(
+                    // dtp_2l4.until(new Trigger(dtp_2l4::atGoal)),
+                    dtp_2l4.until(new Trigger(dtp_2l4::withinTolerance)),
+                    supersystem.coralScoreL4()
+                        .until(supersystem.hasScoredL4),
+                    driveback.spawnCmd()
+                ));
+
+                driveback.recentlyDone().onTrue(supersystem.storagePosition());
 
                 return routine;
         }

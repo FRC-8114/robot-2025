@@ -45,7 +45,7 @@ public class Constants {
         public static final int limSwitchDIO = 0;
         
         public static final double pivotMotorAcceleration = 6;
-        public static final double pivotMotorCruiseVelocity = 1.25;
+        public static final double pivotMotorCruiseVelocity = 2.25;
 
         public static final double pivotMotorGearRatio = 15.0;
     }

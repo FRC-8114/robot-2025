@@ -25,7 +25,7 @@ public class Vision {
     private static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private static final PoseStrategy POSE_STRATEGY = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
     private final CommandSwerveDrivetrain chassis;
-    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(3, 3, 5);
     public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
 
     public final List<NamedPhotonPoseEstimator> poseEstimators;
@@ -100,8 +100,8 @@ public class Vision {
         if (numTags > 1) {
         estStdDevs = MULTI_TAG_STD_DEVS;
         }
-        if (avgDist > 4) {
-            return estStdDevs.times(10);
+        if (avgDist > 2.5) {
+            return estStdDevs.times(100);
         }
         // Increase std devs based on (average) distance
         return estStdDevs.times(1 + (avgDist * avgDist / 30));

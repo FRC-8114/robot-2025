@@ -30,7 +30,7 @@ public class L1Pivot extends SubsystemBase {
     public static class PivotAngle {
         public static final double storage = -0.249268;
         public static final double intake = 0;
-        public static final double score = 0;
+        public static final double score = -0.249268;
         
     }
 
@@ -65,7 +65,7 @@ public class L1Pivot extends SubsystemBase {
         // PID
         pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         pivot_cfg.Slot0.kG = 1;
-        pivot_cfg.Slot0.kP = 6;
+        pivot_cfg.Slot0.kP = 7;
         pivot_cfg.Slot0.kI = 0;
         pivot_cfg.Slot0.kD = 0;
 

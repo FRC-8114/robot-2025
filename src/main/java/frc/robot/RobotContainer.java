@@ -19,6 +19,8 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,7 +50,7 @@ public class RobotContainer {
     CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
     CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     StatusLED status_led = StatusLED.getInstance();
-    // L1Supersystem l1_supersystem = L1Supersystem.getInstance();
+    L1Supersystem l1_supersystem = L1Supersystem.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
 
@@ -112,7 +114,8 @@ public class RobotContainer {
     private List<Pose2d> autoalign_rights;
     private List<Pose2d> hps;
     public void allianceFlipPoses() {
-        hps = AllianceFlipUtil.applyAll(FieldConstants.HPS.both_hps);
+
+        hps = AllianceFlipUtil.applyAll(FieldConstants.HPS.both);
         autoalign_lefts = AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts);
         autoalign_rights = AllianceFlipUtil.applyAll(FieldConstants.Reef.rights);
     }
@@ -178,7 +181,7 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         controller.leftBumper().and(controller.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // controller.leftTrigger().onTrue(l1_supersystem.deployIntake()).onFalse(l1_supersystem.returnIntake());
+        controller.leftTrigger().onTrue(l1_supersystem.deployIntake()).onFalse(l1_supersystem.returnIntake());
 
         controller.povLeft().whileTrue(
             drivetrain.applyRequest(() ->

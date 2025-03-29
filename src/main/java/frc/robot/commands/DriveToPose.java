@@ -30,7 +30,7 @@ public class DriveToPose extends Command {
     private static final double driveMaxAcceleration = 1;
     private static final double thetaMaxVelocity = Units.degreesToRadians(360.0);
     private static final double thetaMaxAcceleration = 8.0;
-    public static final double driveTolerance = 0.02;
+    public static final double driveTolerance = 0.01;
     public static final double thetaTolerance = Units.degreesToRadians(1.0);
     private static final double ffMinRadius = 0;
     private static final double ffMaxRadius = 0.05;
@@ -44,7 +44,7 @@ public class DriveToPose extends Command {
     private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0.0, thetakD,
         new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
     private Translation2d lastSetpointTranslation = Translation2d.kZero;
-    private double driveErrorAbs = 0.0;
+    private double driveErrorAbs = 0.01;
     private double thetaErrorAbs = 0.0;
     private boolean running = false;
     private Supplier<Pose2d> robot = () -> chassis.getPose();
@@ -166,13 +166,17 @@ public class DriveToPose extends Command {
     }
 
     public boolean atGoal() {
-        return running && ((driveController.atGoal() && thetaController.atGoal()) || withinTolerance(driveTolerance, Rotation2d.fromRadians(thetaTolerance)));
+        return running && ((driveController.atGoal() && thetaController.atGoal()) || withinTolerance(driveTolerance, thetaTolerance));
     }
 
-    public boolean withinTolerance(double driveTolerance, Rotation2d thetaTolerance) {
+    public boolean withinTolerance(double driveTolerance, double thetaTolerance) {
         return running
             && Math.abs(driveErrorAbs) < driveTolerance
-            && Math.abs(thetaErrorAbs) < thetaTolerance.getRadians();
+            && Math.abs(thetaErrorAbs) < thetaTolerance;
+    }
+
+    public boolean withinTolerance() {
+        return running && Math.abs(driveErrorAbs) < driveTolerance && Math.abs(thetaErrorAbs) < thetaTolerance;
     }
 
 }

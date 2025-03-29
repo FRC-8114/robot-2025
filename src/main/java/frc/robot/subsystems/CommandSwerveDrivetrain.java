@@ -48,8 +48,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private boolean m_hasAppliedOperatorPerspective = false;
 
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds().withDriveRequestType(DriveRequestType.Velocity);
-    private final PIDController m_pathXController = new PIDController(15, 0, 0.5);
-    private final PIDController m_pathYController = new PIDController(15, 0, 0.5);
+    private final PIDController m_pathXController = new PIDController(15, 0, 0);
+    private final PIDController m_pathYController = new PIDController(15, 0, 0);
     private final PIDController m_pathThetaController = new PIDController(7, 0, 0);
 
     /* Swerve requests to apply during SysId characterization */
