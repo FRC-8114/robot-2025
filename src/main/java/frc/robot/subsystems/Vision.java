@@ -25,7 +25,7 @@ public class Vision {
     private static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private static final PoseStrategy POSE_STRATEGY = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
     private final CommandSwerveDrivetrain chassis;
-    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(3, 3, 5);
+    public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(3, 3, 3.1);
     public static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
 
     public final List<NamedPhotonPoseEstimator> poseEstimators;
@@ -44,19 +44,19 @@ public class Vision {
                 "front_cam"
             );
 
-        NamedPhotonPoseEstimator back_cam = 
-                new NamedPhotonPoseEstimator(
-                    FIELD_LAYOUT,
-                    POSE_STRATEGY,
-                    new PhotonCamera("back_cam"),
-                    new Transform3d(
-                        new Translation3d(-0.0732, -0.2134, 0.621),
-                        new Rotation3d(0.0, 0.0, Math.PI)),
-                    "back_cam"
-                );
+        // NamedPhotonPoseEstimator back_cam = 
+        //         new NamedPhotonPoseEstimator(
+        //             FIELD_LAYOUT,
+        //             POSE_STRATEGY,
+        //             new PhotonCamera("back_cam"),
+        //             new Transform3d(
+        //                 new Translation3d(-0.0732, -0.2134, 0.621),
+        //                 new Rotation3d(0.0, 0.0, Math.PI)),
+        //             "back_cam"
+        //         );
 
-        poseEstimators = List.of(front_cam, back_cam);
-        // poseEstimators = List.of(front_cam);
+        // poseEstimators = List.of(front_cam, back_cam);
+        poseEstimators = List.of(front_cam);
         // poseEstimators = List.of();
     }
 

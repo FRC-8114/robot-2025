@@ -182,6 +182,7 @@ public class RobotContainer {
         controller.leftBumper().and(controller.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         controller.leftTrigger().onTrue(l1_supersystem.deployIntake()).onFalse(l1_supersystem.returnIntake());
+        controller.rightTrigger().onTrue(l1_supersystem.scoreL1()).onFalse(l1_supersystem.stopScore());
 
         controller.povLeft().whileTrue(
             drivetrain.applyRequest(() ->
